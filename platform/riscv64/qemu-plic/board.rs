@@ -40,29 +40,55 @@ pub const IOMMU_SYS_SIZE: usize = 0x1000;
 pub const SIFIVE_TEST_BASE: u64 = 0x100000;
 pub const ROOT_ZONE_DTB_ADDR: u64 = 0x8f000000;
 pub const ROOT_ZONE_KERNEL_ADDR: u64 = 0x90000000;
-pub const ROOT_ZONE_ENTRY: u64 = 0x90000000;
-pub const ROOT_ZONE_CPUS: u64 = (1 << 0) | (1 << 1);
-pub const ROOT_ZONE_NAME: &str = "root-linux";
+// Asterinas is linked at 0x80200000 (guest IPA), loaded at 0x90000000 (host PA).
+// Stage-2 maps guest IPA 0x80200000 -> host PA 0x90000000.
+pub const ROOT_ZONE_ENTRY: u64 = 0x80200000;
+pub const ROOT_ZONE_CPUS: u64 = (1 << 0);
+pub const ROOT_ZONE_NAME: &str = "root-asterinas";
 
 pub const ROOT_ZONE_MEMORY_REGIONS: &[HvConfigMemoryRegion] = &[
+    // Asterinas kernel: host PA 0x90000000 -> guest IPA 0x80200000, size 16MB
     HvConfigMemoryRegion {
         mem_type: MEM_TYPE_RAM,
-        physical_start: 0x84600000,
-        virtual_start: 0x84600000,
-        size: 0x7BA00000,
-    }, // ram
+        physical_start: 0x90000000,
+        virtual_start: 0x80200000,
+        size: 0x01000000,
+    }, // asterinas kernel image (16MB)
+    // RAM for Asterinas heap/stack: host PA 0x87000000 -> guest IPA 0x81200000, size 144MB
+    HvConfigMemoryRegion {
+        mem_type: MEM_TYPE_RAM,
+        physical_start: 0x87000000,
+        virtual_start: 0x81200000,
+        size: 0x09000000,
+    }, // asterinas ram (144MB)
+    // DTB: host PA 0x8f000000 -> guest IPA 0x8f000000 (1:1)
+    HvConfigMemoryRegion {
+        mem_type: MEM_TYPE_RAM,
+        physical_start: 0x8f000000,
+        virtual_start: 0x8f000000,
+        size: 0x01000000,
+    }, // dtb region (16MB)
+    // serial: 1:1 mapping
     HvConfigMemoryRegion {
         mem_type: MEM_TYPE_IO,
         physical_start: 0x10000000,
         virtual_start: 0x10000000,
         size: 0x1000,
     }, // serial
+    // virtio-mmio: 1:1 mapping
     HvConfigMemoryRegion {
         mem_type: MEM_TYPE_IO,
-        physical_start: 0x10008000,
-        virtual_start: 0x10008000,
+        physical_start: 0x10007000,
+        virtual_start: 0x10007000,
         size: 0x1000,
-    }, // virtio
+    }, // virtio console
+    // PLIC: 1:1 mapping
+    HvConfigMemoryRegion {
+        mem_type: MEM_TYPE_IO,
+        physical_start: 0xc000000,
+        virtual_start: 0xc000000,
+        size: 0x4000000,
+    }, // plic
 ];
 
 // The irq number used by the hvisor_device for virtio device wakeup.
@@ -71,10 +97,11 @@ pub const IRQ_WAKEUP_VIRTIO_DEVICE: usize = 0x20;
 // Note: all here's irqs are hardware irqs,
 //  only these irq can be transferred to the physical PLIC.
 // For qemu-virt, 32 is pcie pinA, 33 is pcie pinB, 34 is pcie pinC, 35 is pcie pinD, now only use 33,34
-pub const HW_IRQS: &[u32] = &[10, 33, 34];
+pub const HW_IRQS: &[u32] = &[10, 7];
 
 // irqs belong to the root zone.
-pub const ROOT_ZONE_IRQS_BITMAP: &[BitmapWord] = &get_irqs_bitmap(&[10, 33]);
+// 10 = UART, 7 = virtio-mmio console
+pub const ROOT_ZONE_IRQS_BITMAP: &[BitmapWord] = &get_irqs_bitmap(&[10, 7]);
 
 // Interrupt-controller config for the root zone.
 pub const ROOT_ARCH_ZONE_CONFIG: HvArchZoneConfig = HvArchZoneConfig {

@@ -5,8 +5,9 @@ FSIMG1 := $(image_dir)/virtdisk/rootfs1.ext4
 FSIMG2 := $(image_dir)/virtdisk/rootfs2.ext4
 # HVISOR ENTRY
 HVISOR_ENTRY_PA := 0x80200000
-zone0_kernel := $(image_dir)/kernel/Image
-zone0_dtb    := $(image_dir)/dts/zone0.dtb
+zone0_kernel := $(image_dir)/kernel/asterinas.bin
+zone0_dtb    := $(image_dir)/dts/zone0-asterinas.dtb
+zone0_initramfs := $(image_dir)/kernel/initramfs.cpio.gz
 # zone1_kernel := $(image_dir)/kernel/Image
 # zone1_dtb    := $(image_dir)/devicetree/linux.dtb
 
@@ -20,6 +21,7 @@ QEMU_ARGS += -nographic
 QEMU_ARGS += -kernel $(hvisor_bin)
 QEMU_ARGS += -device loader,file="$(zone0_kernel)",addr=0x90000000,force-raw=on
 QEMU_ARGS += -device loader,file="$(zone0_dtb)",addr=0x8f000000,force-raw=on
+QEMU_ARGS += -device loader,file="$(zone0_initramfs)",addr=0x87e00000,force-raw=on
 # QEMU_ARGS += -device loader,file="$(zone1_kernel)",addr=0x84000000,force-raw=on
 # QEMU_ARGS += -device loader,file="$(zone1_dtb)",addr=0x83000000,force-raw=on
 
