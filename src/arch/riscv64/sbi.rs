@@ -426,7 +426,21 @@ pub fn sbi_srst_handler(fid: usize, current_cpu: &mut ArchCpu) -> SbiRet {
     // Use sbi_rt to perform the actual system reset.
     // reset_type: 0 = shutdown, 1 = cold reboot, 2 = warm reboot
     // reset_reason: 0 = none, 1 = failure, 2 = system failure
-    let result = sbi_rt::system_reset(reset_type, reset_reason);
+    use sbi_rt::{ColdReboot, NoReason, Shutdown, SystemFailure, WarmReboot};
+    let result = match (reset_type, reset_reason) {
+        (0, 0) => sbi_rt::system_reset(Shutdown, NoReason),
+        (0, 1) => sbi_rt::system_reset(Shutdown, SystemFailure),
+        (1, 0) => sbi_rt::system_reset(ColdReboot, NoReason),
+        (1, 1) => sbi_rt::system_reset(ColdReboot, SystemFailure),
+        (2, 0) => sbi_rt::system_reset(WarmReboot, NoReason),
+        (2, 1) => sbi_rt::system_reset(WarmReboot, SystemFailure),
+        _ => {
+            return SbiRet {
+                error: RET_ERR_NOT_SUPPORTED,
+                value: 0,
+            }
+        }
+    };
     SbiRet {
         error: result.error,
         value: result.value,
