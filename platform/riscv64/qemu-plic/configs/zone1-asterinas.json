@@ -33,8 +33,10 @@
     "ivc_configs": [],
     "kernel_filepath": "./asterinas.bin",
     "dtb_filepath": "./zone1-asterinas.dtb",
+    "initramfs_filepath": "./initramfs.cpio.gz",
     "kernel_load_paddr": "0x84000000",
     "dtb_load_paddr":   "0x83000000",
+    "initramfs_load_paddr": "0x87e00000",
     "entry_point":      "0x84000000",
     "arch_config": {
         "plic_base": "0xc000000",

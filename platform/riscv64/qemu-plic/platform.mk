@@ -7,9 +7,8 @@ FSIMG2 := $(image_dir)/virtdisk/rootfs2.ext4
 HVISOR_ENTRY_PA := 0x80200000
 zone0_kernel := $(image_dir)/kernel/Image
 zone0_dtb    := $(image_dir)/dts/zone0.dtb
-# zone1 (Asterinas) images
-# kernel and dtb are loaded by hvisor-tool from zone0 (see zone1-asterinas.json)
-# initramfs is pre-loaded via QEMU loader since hvisor-tool RISC-V doesn't support it yet
+# zone1 (Asterinas) images - all loaded by hvisor-tool from zone0
+# See configs/zone1-asterinas.json for hvisor-tool configuration
 zone1_kernel := $(image_dir)/kernel/asterinas.bin
 zone1_dtb    := $(image_dir)/dts/zone1-asterinas.dtb
 zone1_initramfs := $(image_dir)/kernel/initramfs.cpio.gz
@@ -24,9 +23,8 @@ QEMU_ARGS += -nographic
 QEMU_ARGS += -kernel $(hvisor_bin)
 QEMU_ARGS += -device loader,file="$(zone0_kernel)",addr=0x90000000,force-raw=on
 QEMU_ARGS += -device loader,file="$(zone0_dtb)",addr=0x8f000000,force-raw=on
-# Pre-load zone1 (Asterinas) initramfs into memory (hvisor-tool RISC-V doesn't support initrd yet)
-# zone1 kernel and dtb are loaded by hvisor-tool from zone0 (see zone1-asterinas.json)
-QEMU_ARGS += -device loader,file="$(zone1_initramfs)",addr=0x87e00000,force-raw=on
+# zone1 (Asterinas) images are loaded by hvisor-tool from zone0
+# See configs/zone1-asterinas.json for the configuration
 
 QEMU_ARGS += -drive if=none,file=$(FSIMG1),id=hd0,format=raw
 # QEMU_ARGS += -device virtio-blk-device,drive=hd0,bus=virtio-mmio-bus.7
