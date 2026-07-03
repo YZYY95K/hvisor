@@ -25,8 +25,10 @@ QEMU_ARGS += -kernel $(hvisor_bin)
 QEMU_ARGS += -device loader,file="$(zone0_kernel)",addr=0x90000000,force-raw=on
 QEMU_ARGS += -device loader,file="$(zone0_dtb)",addr=0x8f000000,force-raw=on
 # zone1 kernel and dtb are loaded by hvisor-tool from zone0 (see zone1-asterinas.json)
-# initramfs is pre-loaded via QEMU loader (hvisor-tool RISC-V doesn't support initrd yet)
+# initramfs is pre-loaded via QEMU loader if the file exists
+ifneq ($(wildcard $(zone1_initramfs)),)
 QEMU_ARGS += -device loader,file="$(zone1_initramfs)",addr=0x87e00000,force-raw=on
+endif
 
 QEMU_ARGS += -drive if=none,file=$(FSIMG1),id=hd0,format=raw
 # QEMU_ARGS += -device virtio-blk-device,drive=hd0,bus=virtio-mmio-bus.7
