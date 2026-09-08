@@ -36,13 +36,6 @@
     "kernel_load_paddr": "0x84000000",
     "dtb_load_paddr":   "0x83000000",
     "entry_point":      "0x84000000",
-    "modules": [
-        {
-            "name": "initramfs",
-            "filepath": "./initramfs.cpio.gz",
-            "load_paddr": "0x87e00000"
-        }
-    ],
     "arch_config": {
         "plic_base": "0xc000000",
         "plic_size": "0x600000"

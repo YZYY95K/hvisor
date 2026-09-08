@@ -1,0 +1,6 @@
+refactor: load zone1 kernel/dtb via hvisor-tool, keep initramfs in QEMU loader
+
+Per maintainer feedback: use hvisor-tool to load zone1 kernel and dtb
+instead of QEMU -device loader. initramfs still pre-loaded via QEMU
+since hvisor-tool RISC-V doesn't support initrd loading yet.
+Added zone1-asterinas.json config for hvisor-tool.

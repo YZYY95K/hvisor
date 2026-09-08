@@ -1,0 +1,9 @@
+feat: add initramfs loading to hvisor-tool and remove QEMU initramfs loader
+
+- Modified hvisor-tool's hvisor.c to load initramfs files via
+  initramfs_filepath and initramfs_load_paddr JSON fields
+- Updated zone1-asterinas.json with initramfs configuration
+- Removed initramfs QEMU -device loader from platform.mk since
+  hvisor-tool now handles all zone1 image loading
+- This implements the maintainer's suggestion to load all zone1
+  images via hvisor-tool instead of QEMU

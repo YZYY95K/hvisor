@@ -1,0 +1,6 @@
+fix: keep initramfs QEMU loader per maintainer suggestion
+
+Per liulog's suggestion, initramfs is pre-loaded via QEMU -device loader
+since hvisor-tool RISC-V doesn't support initrd loading yet.
+kernel and dtb are still loaded by hvisor-tool from zone0.
+Removed initramfs fields from zone1-asterinas.json.
